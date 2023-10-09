@@ -24,12 +24,17 @@ export function determineModuleFormatFromTsConfig(
   absolutePathToTsConfig: string
 ): 'cjs' | 'esm' {
   const tsConfig = readTsConfig(absolutePathToTsConfig);
-  if (
-    tsConfig.options.module === ts.ModuleKind.ES2015 ||
-    tsConfig.options.module === ts.ModuleKind.ES2020 ||
-    tsConfig.options.module === ts.ModuleKind.ES2022 ||
-    tsConfig.options.module === ts.ModuleKind.ESNext
-  ) {
+
+  const esmModuleKinds = [
+    ts.ModuleKind.ES2015,
+    ts.ModuleKind.ES2020,
+    ts.ModuleKind.ES2022,
+    ts.ModuleKind.ESNext,
+  ]
+  // codebases with older version of typescript might be missing some of these
+  .filter(moduleKind => !!moduleKind)
+
+  if (esmModuleKinds.includes(tsConfig.options.module)) {
     return 'esm';
   } else {
     return 'cjs';
